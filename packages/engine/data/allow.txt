@@ -1,0 +1,3 @@
+# Words that are always common, whatever the frequency cutoff says.
+# One word per line. Lines starting with # are ignored. Rebuild after editing:
+#   npm run build:dictionary

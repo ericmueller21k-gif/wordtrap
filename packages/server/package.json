@@ -1,0 +1,10 @@
+{
+  "name": "@wordtrap/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Word Trap API: a Cloudflare Worker with one Durable Object per match.",
+  "dependencies": {
+    "@wordtrap/engine": "*"
+  }
+}

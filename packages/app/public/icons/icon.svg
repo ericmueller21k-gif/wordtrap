@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#1f6f5c"/>
+  <g transform="translate(106 96)">
+    <rect x="0" y="12" width="300" height="300" rx="44" fill="#d9b56f"/>
+    <rect x="0" y="0" width="300" height="300" rx="44" fill="#f7e3b5"/>
+    <text x="150" y="212" font-family="Helvetica, Arial, sans-serif" font-size="190" font-weight="800" fill="#2a2116" text-anchor="middle">W</text>
+    <text x="252" y="272" font-family="Helvetica, Arial, sans-serif" font-size="52" font-weight="800" fill="#2a2116" text-anchor="middle">4</text>
+  </g>
+</svg>
