@@ -6,7 +6,7 @@ test("a full pass-the-phone match", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /Word Trap/ })).toBeVisible();
   await shot(page, "01-home-empty");
 
-  await page.getByRole("button", { name: "Pass the phone" }).click();
+  await page.getByRole("button", { name: "Pass the phone", exact: true }).click();
   await page.getByLabel("First player").fill("Eric");
   await page.getByLabel("Second player").fill("Sam");
   await shot(page, "02-new-game");
@@ -105,7 +105,7 @@ test("a full pass-the-phone match", async ({ page }) => {
 
 test("game screens never scroll and keep 44px targets", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Pass the phone" }).click();
+  await page.getByRole("button", { name: "Pass the phone", exact: true }).click();
   await page.getByLabel("First player").fill("Alexandra");
   await page.getByLabel("Second player").fill("Bartholomew");
   await page.getByRole("button", { name: "Start" }).click();

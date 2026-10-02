@@ -26,7 +26,7 @@ test("opens offline after the first visit, and pass-the-phone works offline", as
   await context.setOffline(true);
   await page.reload();
   await expect(page.getByRole("heading", { name: "Word Trap" })).toBeVisible();
-  await page.getByRole("button", { name: "Pass the phone" }).click();
+  await page.getByRole("button", { name: "Pass the phone", exact: true }).click();
   await page.getByLabel("First player").fill("Eric");
   await page.getByLabel("Second player").fill("Sam");
   await page.getByRole("button", { name: "Start" }).click();
