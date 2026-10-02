@@ -1,3 +1,4 @@
+import { BackIcon } from "../components/BackIcon.tsx";
 import { useState } from "preact/hooks";
 
 interface NewLocalGameProps {
@@ -19,9 +20,7 @@ export function NewLocalGameScreen({ onStart, onCancel }: NewLocalGameProps) {
     >
       <header class="form-header">
         <button type="button" class="icon-button" onClick={onCancel} aria-label="Back">
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-            <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
+          <BackIcon />
         </button>
         <h1>Pass-the-phone game</h1>
       </header>

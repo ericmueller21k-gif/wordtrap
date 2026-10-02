@@ -1,20 +1,9 @@
 import { useState } from "preact/hooks";
-import {
-  markSummarySeen,
-  setWord,
-  submitGuess,
-  validateGuess,
-  validateSetWord,
-  viewFor,
-  type Dictionary,
-  type Seat,
-} from "@wordtrap/engine";
+import { markSummarySeen, setWord, submitGuess, viewFor, type Dictionary, type Seat } from "@wordtrap/engine";
+import { GameFlow, pendingSummary } from "./GameFlow.tsx";
 import type { LocalMatch } from "./storage.ts";
 import { FinalScreen } from "./screens/Final.tsx";
-import { GuessScreen } from "./screens/Guess.tsx";
 import { HandoffScreen } from "./screens/Handoff.tsx";
-import { SetWordScreen } from "./screens/SetWord.tsx";
-import { SummaryScreen } from "./screens/Summary.tsx";
 
 interface LocalGameProps {
   match: LocalMatch;
@@ -33,9 +22,9 @@ export function LocalGame({ match, dictionary, onChange, onHome, onRematch }: Lo
   const other: Seat = seat === 0 ? 1 : 0;
   const update = (patch: Partial<LocalMatch>) => onChange({ ...match, ...patch, updatedAt: Date.now() });
 
-  // Whose turn is it? The holder keeps the phone while they have something to do.
-  const pendingSummary = view.rounds.find((r) => r.result && r.index >= view.summariesSeen);
-  const hasWork = reveal !== null || pendingSummary || view.stage.kind === "set" || view.stage.kind === "guess" || view.stage.kind === "finished";
+  // The holder keeps the phone while they have something to do.
+  const kind = view.stage.kind;
+  const hasWork = reveal !== null || pendingSummary(view) || kind === "set" || kind === "guess" || kind === "finished";
 
   if (!hasWork) {
     return (
@@ -50,86 +39,33 @@ export function LocalGame({ match, dictionary, onChange, onHome, onRematch }: Lo
       />
     );
   }
-  if (!ready && view.stage.kind !== "finished") {
+  if (!ready && kind !== "finished") {
     return <HandoffScreen to={state.names[seat]!} from={null} onHome={onHome} onReady={() => setReady(true)} />;
   }
 
-  if (reveal !== null) {
-    const round = view.rounds[reveal]!;
-    return (
-      <GuessScreen
-        key={`reveal-${seat}-${reveal}`}
-        view={view}
-        round={round}
-        validate={() => null}
-        onGuess={async () => ({ ok: false, message: "" })}
-        onDone={() => setReveal(null)}
-        onHome={onHome}
-      />
-    );
-  }
-
-  if (pendingSummary) {
-    return (
-      <SummaryScreen
-        key={`summary-${seat}-${pendingSummary.index}`}
-        view={view}
-        round={pendingSummary}
-        onContinue={() => update({ state: markSummarySeen(state, seat, pendingSummary.index) })}
-      />
-    );
-  }
-
-  const stage = view.stage;
-  if (stage.kind === "set") {
-    const round = view.rounds[stage.round]!;
-    return (
-      <SetWordScreen
-        key={`set-${seat}-${stage.round}`}
-        view={view}
-        round={round}
-        validate={(word) => {
-          const r = validateSetWord(word, round.rack, dictionary);
-          return r.ok ? null : r.message;
-        }}
-        onSubmit={async (word) => {
-          const r = setWord(state, seat, stage.round, word, dictionary);
-          if (!r.ok) return r;
-          update({ state: r.state });
-          return { ok: true };
-        }}
-        onHome={onHome}
-      />
-    );
-  }
-
-  if (stage.kind === "guess") {
-    const round = view.rounds[stage.round]!;
-    return (
-      <GuessScreen
-        key={`guess-${seat}-${stage.round}`}
-        view={view}
-        round={round}
-        validate={(guess) => {
-          const r = validateGuess(
-            guess,
-            { rack: round.rack, length: round.clue!.length, previousGuesses: round.myGuesses.map((g) => g.word) },
-            dictionary,
-          );
-          return r.ok ? null : r.message;
-        }}
-        onGuess={async (guess) => {
-          const r = submitGuess(state, seat, stage.round, guess, dictionary);
-          if (!r.ok) return r;
-          if (r.doneGuessing) setReveal(stage.round);
-          update({ state: r.state });
-          return { ok: true, marks: r.marks, caught: r.caught, doneGuessing: r.doneGuessing };
-        }}
-        onDone={() => setReveal(null)}
-        onHome={onHome}
-      />
-    );
-  }
-
-  return <FinalScreen view={view} local onRematch={onRematch} onHome={onHome} />;
+  return (
+    <GameFlow
+      view={view}
+      dictionary={dictionary}
+      keyPrefix={`seat${seat}`}
+      reveal={reveal}
+      setReveal={setReveal}
+      setWord={async (round, word) => {
+        const r = setWord(state, seat, round, word, dictionary);
+        if (!r.ok) return r;
+        update({ state: r.state });
+        return { ok: true };
+      }}
+      guess={async (round, guess) => {
+        const r = submitGuess(state, seat, round, guess, dictionary);
+        if (!r.ok) return r;
+        update({ state: r.state });
+        return { ok: true, marks: r.marks, caught: r.caught, doneGuessing: r.doneGuessing };
+      }}
+      summarySeen={(round) => update({ state: markSummarySeen(state, seat, round) })}
+      waiting={() => <></>}
+      final={() => <FinalScreen view={view} local onRematch={onRematch} onHome={onHome} />}
+      onHome={onHome}
+    />
+  );
 }

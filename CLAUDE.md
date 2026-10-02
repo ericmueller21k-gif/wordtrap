@@ -22,7 +22,7 @@ Make the judgement calls yourself (open questions, tuning, design details) and r
 - [x] 1. Rules engine (`packages/engine`)
 - [x] 2. Balance report (`npm run balance` → `reports/balance.md`)
 - [x] 3. Playable on one phone (`packages/app`, pass-the-phone mode)
-- [ ] 4. Online play
+- [x] 4. Online play (`packages/server`: Cloudflare Worker + Durable Objects; deploy steps in `DEPLOY.md`)
 - [ ] 5. Install polish
 
 Tick a milestone off here when it is built.
@@ -33,6 +33,8 @@ Tick a milestone off here when it is built.
 - `packages/engine`: the pure rules engine (scoring, validation, feedback, rack and board generation, word-list building). No UI, network or file I/O in `src/`, except `src/node.ts`, which loads the word lists from disk for Node callers.
 - `packages/engine/src/match.ts`: the match flow and per-player views (visibility rules). Shared by client and server.
 - `packages/app`: the phone web app (Vite + Preact). Screens in `src/screens/`.
+- `packages/server`: the API. `src/room.ts` is pure, testable match-room logic; `src/match-room.ts` is the Durable
+  Object; `src/index.ts` routes `/api/*` and serves the app. Config: `wrangler.jsonc` at the repo root.
 - `e2e/`: Playwright tests that play full matches on emulated phones.
 - `packages/engine/src/settings.ts`: every tunable rule. Change numbers here, never in game code.
 - `packages/engine/data/`: word-list sources, `allow.txt` and `deny.txt` overrides, and the generated `words/real.txt` and `words/common.txt`. Licences are in `data/SOURCES.md`.
@@ -41,8 +43,9 @@ Tick a milestone off here when it is built.
 npm install
 npm test                  # vitest, all packages
 npm run typecheck
-npm run dev               # app dev server
-npm run e2e               # Playwright: full matches on emulated phones (uses the preinstalled Chromium)
+npm run dev               # app dev server (pass-the-phone only; no API)
+npx wrangler dev          # app + API + Durable Objects locally at http://localhost:8787
+npm run e2e               # Playwright against wrangler dev: local and online matches on emulated phones
 npm run build:dictionary  # regenerate words/*.txt after editing allow.txt, deny.txt or the cutoff
 npm run balance           # regenerate reports/balance.md after changing settings or word lists
 ```

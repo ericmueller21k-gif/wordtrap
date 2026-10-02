@@ -1,3 +1,4 @@
+import { BackIcon } from "../components/BackIcon.tsx";
 interface HandoffProps {
   to: string;
   from: string | null;
@@ -10,9 +11,7 @@ export function HandoffScreen({ to, from, onReady, onHome }: HandoffProps) {
   return (
     <div class="screen handoff">
       <button type="button" class="icon-button handoff-home" onClick={onHome} aria-label="Home">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-          <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
+        <BackIcon />
       </button>
       <div class="handoff-body">
         <div class="handoff-icon" aria-hidden="true">

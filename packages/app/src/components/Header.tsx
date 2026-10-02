@@ -1,3 +1,4 @@
+import { BackIcon } from "./BackIcon.tsx";
 interface HeaderProps {
   round: number;
   roundsTotal: number;
@@ -11,9 +12,7 @@ export function Header({ round, roundsTotal, myName, opponentName, totals, onHom
   return (
     <header class="game-header">
       <button type="button" class="icon-button" onClick={onHome} aria-label="Home">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-          <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
+        <BackIcon />
       </button>
       <div class="header-round">
         Round {round + 1}

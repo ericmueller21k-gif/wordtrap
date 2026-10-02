@@ -13,11 +13,13 @@ export interface MatchSummary {
 
 interface HomeProps {
   matches: MatchSummary[];
+  onNewOnline: () => void;
+  onJoin: () => void;
   onNewLocal: () => void;
   children?: ComponentChildren;
 }
 
-export function HomeScreen({ matches, onNewLocal, children }: HomeProps) {
+export function HomeScreen({ matches, onNewOnline, onJoin, onNewLocal, children }: HomeProps) {
   return (
     <div class="screen home">
       <header class="home-header">
@@ -51,9 +53,17 @@ export function HomeScreen({ matches, onNewLocal, children }: HomeProps) {
       </main>
       <footer class="home-footer">
         {children}
-        <button type="button" class="btn btn-secondary btn-wide" onClick={onNewLocal}>
-          Pass-the-phone game
+        <button type="button" class="btn btn-primary btn-wide" onClick={onNewOnline}>
+          New game
         </button>
+        <div class="actions">
+          <button type="button" class="btn btn-secondary" onClick={onJoin}>
+            Join with a code
+          </button>
+          <button type="button" class="btn btn-secondary" onClick={onNewLocal}>
+            Pass the phone
+          </button>
+        </div>
       </footer>
     </div>
   );

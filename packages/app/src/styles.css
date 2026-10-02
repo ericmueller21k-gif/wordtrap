@@ -1128,3 +1128,39 @@ button.slot {
     transition-duration: 1ms !important;
   }
 }
+
+/* ---- Online extras ---- */
+
+.banner {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: calc(var(--col) - 24px);
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  animation: sheet-up 200ms ease-out;
+}
+
+.banner-retry {
+  text-decoration: underline;
+  margin-left: 6px;
+}
+
+.rejoin {
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.rejoin-code {
+  color: var(--text);
+  letter-spacing: 1px;
+  -webkit-user-select: text;
+  user-select: text;
+}

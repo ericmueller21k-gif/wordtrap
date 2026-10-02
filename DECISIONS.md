@@ -62,3 +62,27 @@ these were made without a review. Each one is easy to reverse. Most are a single
 - **Tests:** Playwright plays a full match on emulated iPhone 13, iPhone SE (3rd gen) and Pixel 7, and checks that
   game screens don't scroll and that every button is at least 44 px. Chromium stands in for Safari here, so the
   real-iPhone check in milestone 5 still matters.
+
+## Milestone 4: online play
+
+- **Hosting: Cloudflare Workers + Durable Objects, free plan.** This is the cheapest managed option: $0, no card,
+  and one service for the app, the API and storage. Each match is one Durable Object named by its join code, holding
+  the racks, boards and secret words in its own SQLite-backed storage. So there's no separate database to set up,
+  and moves can't race because a Durable Object handles one request at a time. Deploys come from GitHub through
+  Cloudflare's Git integration (`DEPLOY.md`). No paid service is used, so the spec's approval rule isn't triggered,
+  but Eric has to create the account.
+- **The server is the authority.** It validates every word and guess with the same engine and sends each device
+  only `viewFor(seat)`. Tests check that the other word never appears in a player's response before the reveal.
+- **Codes:** join codes are 6 characters from an alphabet with no I, L, O, 0 or 1. The rejoin code is the join code
+  plus a 6-character personal secret (`K7PM2Q-W3XRT9`). One "Join with a code" box takes either. A rejoin hands back
+  the same seat token, so the same game works on a second device or in the installed home-screen app.
+- **Seat token:** 24 random bytes, kept in `localStorage` with the last view of each match, so a match opens
+  instantly with no spinner and then refreshes.
+- **Updates: polling instead of push** (the spec has no push in v1). Every 5 s while waiting, every 30 s after 10
+  quiet minutes, never while the app is in the background, and Home refreshes when opened. This keeps one active
+  match well inside the free Durable Object allowance.
+- **Rematch:** the first player to tap Rematch creates the new match, with credentials for both seats stored in the
+  old one. The other player's final screen then shows "Play Eric's rematch".
+- **Invite link:** `https://<host>/join/K7PM2Q` opens the join screen. If this device is already in that game, it
+  opens the game instead.
+- **Not built:** cleaning up abandoned matches (storage is tiny), and rate limiting (not a sensitive app).

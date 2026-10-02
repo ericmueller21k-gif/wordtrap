@@ -1,15 +1,18 @@
 import type { PlayerView } from "@wordtrap/engine";
 import { Header } from "../components/Header.tsx";
+import { shareInvite } from "./Invite.tsx";
 
 interface WaitingProps {
   view: PlayerView;
   /** Invite link to share, while the friend hasn't joined. */
   inviteUrl?: string;
   joinCode?: string;
+  /** This player's personal code for getting back in from another device. */
+  rejoinCode?: string;
   onHome: () => void;
 }
 
-export function WaitingScreen({ view, inviteUrl, joinCode, onHome }: WaitingProps) {
+export function WaitingScreen({ view, inviteUrl, joinCode, rejoinCode, onHome }: WaitingProps) {
   const opponent = view.opponentName;
   const round = view.stage.kind === "finished" ? view.roundsTotal - 1 : view.stage.round;
   const title =
@@ -18,17 +21,6 @@ export function WaitingScreen({ view, inviteUrl, joinCode, onHome }: WaitingProp
       : opponent
         ? `Word locked in. Waiting for ${opponent}.`
         : "Word locked in. Waiting for your friend to join.";
-
-  const share = async () => {
-    if (!inviteUrl) return;
-    const text = `Play Word Trap with me! Join code ${joinCode}`;
-    try {
-      if (navigator.share) await navigator.share({ title: "Word Trap", text, url: inviteUrl });
-      else await navigator.clipboard.writeText(`${text}: ${inviteUrl}`);
-    } catch {
-      // Share sheet dismissed.
-    }
-  };
 
   return (
     <div class="screen game-screen">
@@ -52,10 +44,17 @@ export function WaitingScreen({ view, inviteUrl, joinCode, onHome }: WaitingProp
           <div class="invite">
             <div class="invite-code-label muted">Join code</div>
             <div class="invite-code">{joinCode}</div>
-            <button type="button" class="btn btn-primary btn-wide" onClick={share}>
+            <button type="button" class="btn btn-primary btn-wide" onClick={() => shareInvite(joinCode ?? "", inviteUrl)}>
               Share invite link
             </button>
           </div>
+        )}
+        {rejoinCode && (
+          <p class="rejoin muted small">
+            Your rejoin code: <strong class="rejoin-code">{rejoinCode}</strong>
+            <br />
+            Use it to get back into this game on another device or from the home-screen app.
+          </p>
         )}
       </main>
     </div>

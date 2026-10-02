@@ -5,15 +5,15 @@ export default defineConfig({
   timeout: 120_000,
   reporter: "list",
   use: {
-    baseURL: "http://localhost:4173",
+    baseURL: "http://localhost:8787",
     trace: "retain-on-failure",
   },
+  // The real Worker and Durable Objects, run locally by wrangler (it builds the app first).
   webServer: {
-    command: "npm run build -w @wordtrap/app && npm run preview -w @wordtrap/app -- --port 4173 --strictPort",
-    cwd: ".",
-    url: "http://localhost:4173",
+    command: "npx wrangler dev --port 8787",
+    url: "http://localhost:8787",
     reuseExistingServer: true,
-    timeout: 60_000,
+    timeout: 120_000,
   },
   projects: [
     { name: "iphone", use: { ...devices["iPhone 13"], browserName: "chromium" } },
