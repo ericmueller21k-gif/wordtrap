@@ -1,0 +1,11 @@
+{
+  "name": "@wordtrap/engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure Word Trap rules engine: scoring, validation, feedback, rack and board generation.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./node": "./src/node.ts"
+  }
+}
