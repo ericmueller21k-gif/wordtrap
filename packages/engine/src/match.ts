@@ -63,11 +63,17 @@ export function joinMatch(state: MatchState, name: string): MatchState {
  * What this player can do now. The creator may set their round 1 word before
  * the second player joins.
  */
-export function stageFor(state: MatchState, seat: Seat): Stage {
+export function stageFor(state: MatchState, seat: Seat, settings: Settings = DEFAULT_SETTINGS): Stage {
   for (let r = 0; r < state.rounds.length; r++) {
     const me = state.progress[r]![seat];
     const them = state.progress[r]![other(seat)];
-    if (me.word === null) return { kind: "set", round: r };
+    if (me.word === null) {
+      // Optionally hold the next round until both players have finished guessing this one.
+      if (r > 0 && settings.waitForRoundEnd && !isRoundComplete(state, r - 1)) {
+        return { kind: "waitingForGuesses", round: r - 1 };
+      }
+      return { kind: "set", round: r };
+    }
     if (!me.doneGuessing) {
       return them.word === null ? { kind: "waitingForWord", round: r } : { kind: "guess", round: r };
     }
@@ -141,7 +147,7 @@ export function setWord(
   dictionary: Dictionary,
   settings: Settings = DEFAULT_SETTINGS,
 ): { ok: true; state: MatchState } | MatchError {
-  const stage = stageFor(state, seat);
+  const stage = stageFor(state, seat, settings);
   if (stage.kind !== "set" || stage.round !== round) return notYourTurn();
   const { rack, reusable } = state.rounds[round]!;
   const check = validateSetWord(word, rack, dictionary, settings, reusable);
@@ -165,7 +171,7 @@ export function submitGuess(
   dictionary: Dictionary,
   settings: Settings = DEFAULT_SETTINGS,
 ): GuessOutcome | MatchError {
-  const stage = stageFor(state, seat);
+  const stage = stageFor(state, seat, settings);
   if (stage.kind !== "guess" || stage.round !== round) return notYourTurn();
   const me = state.progress[round]![seat];
   const secret = state.progress[round]![other(seat)].word!;
@@ -250,7 +256,7 @@ function guessViews(guesses: readonly string[], secret: string | null): GuessVie
  * player's word appears only once this player has finished guessing it.
  */
 export function viewFor(state: MatchState, seat: Seat, settings: Settings = DEFAULT_SETTINGS): PlayerView {
-  const stage = stageFor(state, seat);
+  const stage = stageFor(state, seat, settings);
   const opp = other(seat);
   const reached = stage.kind === "finished" ? state.rounds.length : stage.round + 1;
   const rounds: RoundView[] = [];
@@ -285,7 +291,7 @@ export function viewFor(state: MatchState, seat: Seat, settings: Settings = DEFA
     myName: state.names[seat] ?? "",
     opponentName: state.names[opp],
     stage,
-    opponentStage: stageFor(state, opp).kind,
+    opponentStage: stageFor(state, opp, settings).kind,
     roundsTotal: state.rounds.length,
     guessesPerWord: settings.guessesPerWord,
     totals: seat === 0 ? totals : [totals[1], totals[0]],

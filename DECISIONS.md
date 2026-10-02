@@ -117,3 +117,16 @@ these were made without a review. Each one is easy to reverse. Most are a single
 - **Balance effect** (`reports/balance.md`): the catch rate drops from 71% to 67%, and the best word to set is now
   usually 4 letters (52%), with 5 letters at 16% and 6 at 4%. Before, it was mostly 3 letters. Word choice is more
   varied, so guesses stay at 2.
+
+## After the first real game (Eric, Oct 2, 2026)
+
+- **Rounds now wait for both players** (`waitForRoundEnd: true`). In the first real game, a player who finished
+  guessing jumped into the next round, then got pulled back to the previous round's results when the other player
+  finished. Now a player who finishes guessing sees "Waiting for Sam to finish guessing", then the round results,
+  then the next round. This reverses the spec's step 6 at Eric's request; setting it to `false` restores the
+  spec's flow.
+- **Scoreboard from any game screen:** the score in the header ("You · Sam 32–25") opens a round-by-round table
+  with a two-line reminder of how scoring works.
+- **Results explain the points:** each word now reads like "WINED was worth 30. Choder caught it on guess 2, so
+  Choder +15 (half, rounded up) and 67 +0." The first game showed the right totals, but it wasn't clear why a
+  caught player's opponent scored.

@@ -45,14 +45,7 @@ export function GuessScreen({ view, round, validate, onGuess, onDone, onHome }: 
 
   return (
     <div class="screen game-screen">
-      <Header
-        round={round.index}
-        roundsTotal={view.roundsTotal}
-        myName={view.myName}
-        opponentName={opponent}
-        totals={view.totals}
-        onHome={onHome}
-      />
+      <Header round={round.index} view={view} onHome={onHome} />
       <main class="game-main">
         <div class="clue-card">
           <div class="clue-label">{opponent}'s word</div>

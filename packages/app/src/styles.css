@@ -1241,3 +1241,49 @@ button.slot {
   font-size: 14px;
   color: var(--muted);
 }
+
+/* ---- Header score button and score sheet ---- */
+
+button.header-score {
+  border: none;
+  background: var(--surface);
+  border-radius: 12px;
+  min-height: 44px;
+  padding: 4px 10px;
+  margin-right: 8px;
+  display: grid;
+  justify-items: end;
+  gap: 0;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+button.header-score:active {
+  transform: scale(0.97);
+}
+
+.header-score-names {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.header-score-nums {
+  display: flex;
+  gap: 6px;
+  line-height: 1.2;
+}
+
+.score-sheet .final-table {
+  margin-top: 0;
+}
+
+.summary-points {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.summary-points strong {
+  color: var(--text);
+}

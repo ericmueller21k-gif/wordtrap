@@ -18,6 +18,11 @@ export interface Settings {
   rackSize: number;
   minWordLength: number;
   guessesPerWord: number;
+  /**
+   * true: nobody starts the next round until both players have finished guessing this one.
+   * false (spec.md): a player can set their next word as soon as their own guessing ends.
+   */
+  waitForRoundEnd: boolean;
   /** Bonus by word length, added after multipliers, paid only on survival. */
   lengthBonus: Readonly<Record<number, number>>;
   /** Fraction of the tile score a catcher earns, rounded up. */
@@ -66,6 +71,8 @@ export const DEFAULT_SETTINGS: Settings = {
   // spec.md starts at 3; the balance report (reports/balance.md) showed 3 lets the
   // guesser catch ~94% of words, so v1 playtests with 2. See DECISIONS.md.
   guessesPerWord: 2,
+  // Eric, Oct 2 2026, after the first real game: wait for both players before the next round.
+  waitForRoundEnd: true,
   // Eric, Oct 2 2026 (spec started at 5: +1, 6: +5, 7: +10).
   lengthBonus: { 4: 2, 5: 5, 6: 10, 7: 20 },
   catchRewardFraction: 0.5,

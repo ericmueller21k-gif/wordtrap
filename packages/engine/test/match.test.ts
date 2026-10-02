@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  DEFAULT_SETTINGS,
   createMatch,
   Dictionary,
   isMatchFinished,
@@ -55,7 +56,7 @@ describe("match flow", () => {
     expect(setWord(s, 0, 0, "ZZZ", dict)).toMatchObject({ ok: false, problem: "no_tiles" });
   });
 
-  it("ends guessing on a catch or after the last guess, then moves on without waiting", () => {
+  it("ends guessing on a catch or after the last guess, then waits for the other player", () => {
     let s = newMatch();
     s = ok(setWord(s, 0, 0, "THIS", dict)).state;
     s = ok(setWord(s, 1, 0, "QUITE", dict)).state;
@@ -73,22 +74,32 @@ describe("match flow", () => {
     expect(g2.doneGuessing).toBe(true); // 2 guesses per word
     s = g2.state;
 
-    // Eric can set round 2 before Sam finishes guessing.
-    expect(stageFor(s, 0)).toEqual({ kind: "set", round: 1 });
+    // Eric sees Sam's word, but the next round waits for Sam to finish guessing.
     expect(viewFor(s, 0).rounds[0]!.opponentWord).toBe("QUITE");
-    expect(viewFor(s, 0).rounds[0]!.result).toBeNull();
-
-    s = ok(setWord(s, 0, 1, "HIT", dict)).state;
-    expect(stageFor(s, 0)).toEqual({ kind: "waitingForWord", round: 1 });
+    expect(stageFor(s, 0)).toEqual({ kind: "waitingForGuesses", round: 0 });
+    expect(setWord(s, 0, 1, "HIT", dict)).toMatchObject({ ok: false, problem: "not_your_turn" });
 
     const g3 = ok(submitGuess(s, 1, 0, "THIS", dict));
     expect(g3.caught).toBe(true);
     s = g3.state;
+    expect(stageFor(s, 0)).toEqual({ kind: "set", round: 1 });
+    expect(stageFor(s, 1)).toEqual({ kind: "set", round: 1 });
 
     // Round 1: Eric's THIS caught (Sam gets 8), Sam's QUITE survived (32 + 5 bonus).
     expect(viewFor(s, 0).rounds[0]!.result).toEqual({ scores: [0, 45], caught: [true, false] });
     expect(viewFor(s, 1).rounds[0]!.result).toEqual({ scores: [45, 0], caught: [false, true] });
     expect(matchTotals(s)).toEqual([0, 45]);
+  });
+
+  it("with waitForRoundEnd off (the spec's flow), lets a player set their next word straight away", () => {
+    const spec = { ...DEFAULT_SETTINGS, waitForRoundEnd: false };
+    let s = newMatch();
+    s = ok(setWord(s, 0, 0, "THIS", dict, spec)).state;
+    s = ok(setWord(s, 1, 0, "QUITE", dict, spec)).state;
+    s = ok(submitGuess(s, 0, 0, "QUITE", dict, spec)).state;
+    expect(stageFor(s, 0, spec)).toEqual({ kind: "set", round: 1 });
+    s = ok(setWord(s, 0, 1, "HIT", dict, spec)).state;
+    expect(stageFor(s, 0, spec)).toEqual({ kind: "waitingForWord", round: 1 });
   });
 
   it("finishes after the last round", () => {
