@@ -13,13 +13,15 @@ export interface MatchSummary {
 
 interface HomeProps {
   matches: MatchSummary[];
+  /** Running as the installed home-screen app. */
+  standalone?: boolean;
   onNewOnline: () => void;
   onJoin: () => void;
   onNewLocal: () => void;
   children?: ComponentChildren;
 }
 
-export function HomeScreen({ matches, onNewOnline, onJoin, onNewLocal, children }: HomeProps) {
+export function HomeScreen({ matches, standalone, onNewOnline, onJoin, onNewLocal, children }: HomeProps) {
   return (
     <div class="screen home">
       <header class="home-header">
@@ -32,6 +34,12 @@ export function HomeScreen({ matches, onNewOnline, onJoin, onNewLocal, children 
           <div class="home-empty">
             <p>Both players get the same seven tiles and secretly build a word.</p>
             <p>Then you each get to see the length and score of the other's word, and try to catch it.</p>
+            {standalone && (
+              <p>
+                Already playing in your browser? Tap <strong>Join with a code</strong> and enter your rejoin code to bring
+                the game here.
+              </p>
+            )}
           </div>
         ) : (
           <ul class="match-list">

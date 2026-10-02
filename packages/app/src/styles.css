@@ -1164,3 +1164,44 @@ button.slot {
   -webkit-user-select: text;
   user-select: text;
 }
+
+/* ---- Install card ---- */
+
+.install-card {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+}
+
+.install-close {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  color: var(--muted);
+}
+
+.install-title {
+  font-weight: 800;
+  padding-right: 36px;
+}
+
+.install-text {
+  line-height: 1.45;
+}
+
+.share-icon {
+  vertical-align: -3px;
+  color: var(--accent);
+}
+
+.install-codes ul {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+}

@@ -86,3 +86,19 @@ these were made without a review. Each one is easy to reverse. Most are a single
 - **Invite link:** `https://<host>/join/K7PM2Q` opens the join screen. If this device is already in that game, it
   opens the game instead.
 - **Not built:** cleaning up abandoned matches (storage is tiny), and rate limiting (not a sensitive app).
+
+## Milestone 5: install polish
+
+- **Manifest:** `display: standalone`, portrait, green theme, with 192/512 icons plus a maskable icon (a "W" tile,
+  drawn in `public/icons/icon.svg`; `scripts/make-icons.mjs` renders the PNGs). iPhone gets
+  `apple-mobile-web-app-capable` and a translucent status bar. The layout already pads for the notch and home bar.
+- **Service worker** (generated at build time with every built file precached): the app opens instantly and works
+  offline for pass-the-phone games. The API is never cached. New versions take effect the next time the app is
+  opened, never mid-game.
+- **Add to Home Screen:** Android/Chrome gets a real **Install app** button (`beforeinstallprompt`). iPhone Safari has
+  no install API, so it gets a short instruction card. Either card can be dismissed for good.
+- **iPhone storage:** the installed app doesn't share storage with Safari, so the iPhone card lists the rejoin codes
+  for games in progress, and the installed app's empty Home says how to bring them over with **Join with a code**.
+- **Not done (it needs Eric):** testing on a real iPhone and a real Android phone, using `TESTING.md`.
+- **Not done (optional):** iPhone launch splash images (iOS needs one per screen size). The app shows its own splash
+  for the moment it takes to load.

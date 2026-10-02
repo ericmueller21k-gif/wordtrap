@@ -23,7 +23,7 @@ Make the judgement calls yourself (open questions, tuning, design details) and r
 - [x] 2. Balance report (`npm run balance` → `reports/balance.md`)
 - [x] 3. Playable on one phone (`packages/app`, pass-the-phone mode)
 - [x] 4. Online play (`packages/server`: Cloudflare Worker + Durable Objects; deploy steps in `DEPLOY.md`)
-- [ ] 5. Install polish
+- [x] 5. Install polish (manifest, icons, service worker, install prompt). Real-phone check by Eric: `TESTING.md`
 
 Tick a milestone off here when it is built.
 

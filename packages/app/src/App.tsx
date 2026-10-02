@@ -9,6 +9,8 @@ import {
   type MatchState,
 } from "@wordtrap/engine";
 import { api } from "./api.ts";
+import { InstallCard } from "./components/InstallCard.tsx";
+import { isStandalone } from "./install.ts";
 import { LocalGame } from "./LocalGame.tsx";
 import { inviteUrl, OnlineGame, onlineStatus } from "./OnlineGame.tsx";
 import { CodeEntryScreen } from "./screens/CodeEntry.tsx";
@@ -52,8 +54,8 @@ function localStatus(state: MatchState): { status: string; finished: boolean } {
       return st.kind === "finished" ? state.rounds.length - 1 : st.round;
     }),
   );
-  const who = turns.length === 2 ? "Either player's turn" : turns.length === 1 ? `${state.names[turns[0]!]}'s turn` : "In progress";
-  return { status: `Round ${round + 1} · ${who} · Pass the phone`, finished: false };
+  const who = turns.length === 1 ? `${state.names[turns[0]!]}'s turn` : "Pass the phone";
+  return { status: `Round ${round + 1} · ${who}`, finished: false };
 }
 
 /** An invite link (/join/K7PM2Q) opens the join flow. */
@@ -304,13 +306,20 @@ export function App() {
     }
   }
 
+  const rejoinCodes = onlines
+    .filter((m) => m.match.view.stage.kind !== "finished")
+    .map((m) => ({ title: `vs ${m.match.view.opponentName ?? "friend"}`, code: m.rejoinCode }));
+
   return (
     <HomeScreen
       matches={summaries}
+      standalone={isStandalone()}
       onNewOnline={() => setRoute({ name: "new-online" })}
       onJoin={() => setRoute({ name: "code" })}
       onNewLocal={() => setRoute({ name: "new-local" })}
-    />
+    >
+      <InstallCard rejoinCodes={rejoinCodes} />
+    </HomeScreen>
   );
 }
 
