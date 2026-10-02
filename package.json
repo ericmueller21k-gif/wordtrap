@@ -8,7 +8,8 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc -p packages/engine --noEmit",
-    "build:dictionary": "tsx packages/engine/scripts/build-dictionary.ts"
+    "build:dictionary": "tsx packages/engine/scripts/build-dictionary.ts",
+    "balance": "tsx packages/engine/scripts/balance-report.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

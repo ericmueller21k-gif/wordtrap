@@ -35,6 +35,12 @@ export interface Settings {
   dictionary: {
     /** How many of the most frequent 3-7 letter words form the common list. */
     commonCutoff: number;
+    /**
+     * A regular inflection of a common word is common only if it appears at
+     * least this often in the subtitle corpus (0 accepts any real inflection).
+     * Filters out real-but-odd forms like ABODED and HEEDER.
+     */
+    inflectionMinCount: number;
   };
   letterValues: Readonly<Record<string, number>>;
   /** Tile bag (count per letter). Standard English Scrabble, no blanks. */
@@ -45,13 +51,15 @@ export const DEFAULT_SETTINGS: Settings = {
   roundsPerMatch: 5,
   rackSize: 7,
   minWordLength: 3,
-  guessesPerWord: 3,
+  // spec.md starts at 3; the balance report (reports/balance.md) showed 3 lets the
+  // guesser catch ~94% of words, so v1 playtests with 2. See DECISIONS.md.
+  guessesPerWord: 2,
   lengthBonus: { 5: 1, 6: 5, 7: 10 },
   catchRewardFraction: 0.5,
   letterSquare: { multipliers: [2, 3], weights: [1, 1], minSlot: 1, maxSlot: 7 },
   wordSquare: { multipliers: [2, 3], weights: [1, 1], minSlot: 4, maxSlot: 7 },
   rackFilter: { minCommonWords: 25, minLongWords: 3, longWordLength: 5, maxRedraws: 10_000 },
-  dictionary: { commonCutoff: 10_000 },
+  dictionary: { commonCutoff: 10_000, inflectionMinCount: 20 },
   letterValues: {
     A: 1, E: 1, I: 1, L: 1, N: 1, O: 1, R: 1, S: 1, T: 1, U: 1,
     D: 2, G: 2,

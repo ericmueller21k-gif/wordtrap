@@ -38,8 +38,8 @@ export function inflectionCandidates(word: string): string[] {
 export interface WordListSources {
   /** The large real-word list (any case, any length). */
   realWords: Iterable<string>;
-  /** Words in descending frequency order (any case). */
-  frequencyRanked: Iterable<string>;
+  /** Words with corpus counts, in descending frequency order (any case). */
+  frequencyRanked: Iterable<readonly [word: string, count: number]>;
   /**
    * Hand-edited: always common (if made of letters and in length range),
    * unless listed directly in the deny or offensive lists.
@@ -57,6 +57,11 @@ export interface WordListSources {
   offensive: Iterable<string>;
   /** Number of most frequent in-range real words taken before inflections. */
   commonCutoff: number;
+  /**
+   * An inflection of a common word is common only if the corpus has it at
+   * least this many times. 0 accepts every real inflection.
+   */
+  inflectionMinCount: number;
   minLength: number;
   maxLength: number;
 }
@@ -95,11 +100,13 @@ export function buildWordLists(sources: WordListSources): WordLists {
   const real = new Set<string>();
   for (const w of clean(sources.realWords)) if (inRange(w) && !offensive.has(w)) real.add(w);
 
+  const counts = new Map<string, number>();
   const common = new Set<string>();
   const frequent: string[] = [];
-  for (const raw of sources.frequencyRanked) {
-    if (frequent.length >= sources.commonCutoff) break;
+  for (const [raw, count] of sources.frequencyRanked) {
     const w = raw.trim().toUpperCase();
+    if (!counts.has(w)) counts.set(w, count);
+    if (frequent.length >= sources.commonCutoff) continue;
     if (!real.has(w) || deny.has(w) || common.has(w)) continue;
     common.add(w);
     frequent.push(w);
@@ -108,7 +115,8 @@ export function buildWordLists(sources: WordListSources): WordLists {
   let fromInflection = 0;
   for (const base of frequent) {
     for (const form of inflectionCandidates(base)) {
-      if (real.has(form) && !deny.has(form) && !common.has(form)) {
+      const attested = (counts.get(form) ?? 0) >= sources.inflectionMinCount;
+      if (attested && real.has(form) && !deny.has(form) && !common.has(form)) {
         common.add(form);
         fromInflection++;
       }

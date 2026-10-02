@@ -12,6 +12,9 @@ FUCKER
 GOOK
 RETARD
 
+# Abbreviations that the real-word list spells as words.
+AWOL
+
 # Fragments of contractions ("ain't") that the subtitle frequency list
 # over-counts.
 AIN

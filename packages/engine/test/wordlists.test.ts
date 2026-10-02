@@ -28,11 +28,14 @@ describe("inflectionCandidates", () => {
 describe("buildWordLists", () => {
   const base = {
     realWords: ["the", "cat", "cats", "dog", "dogs", "running", "run", "zebra", "rue", "ruing", "ox", "elephants", "slur", "slurs", "bob", "bobs"],
-    frequencyRanked: ["the", "ox", "cat", "run", "dog", "slur", "bob", "zebra", "rue"],
+    frequencyRanked: ["the", "ox", "cat", "run", "dog", "slur", "bob", "zebra", "rue", "cats", "running", "dogs"].map(
+      (w, i) => [w, 100 - i] as const,
+    ),
     allow: [] as string[],
     deny: [] as string[],
     offensive: [] as string[],
     commonCutoff: 3,
+    inflectionMinCount: 0,
     minLength: 3,
     maxLength: 7,
   };
@@ -42,6 +45,11 @@ describe("buildWordLists", () => {
     expect(common).toEqual(["CAT", "CATS", "RUN", "RUNNING", "THE"]);
     expect(real).not.toContain("OX");
     expect(real).not.toContain("ELEPHANTS");
+  });
+
+  it("can require inflections to be attested in the corpus", () => {
+    const counted = { ...base, frequencyRanked: [["cat", 50], ["run", 40], ["the", 30], ["cats", 25], ["running", 5]] as const };
+    expect(buildWordLists({ ...counted, inflectionMinCount: 20 }).common).toEqual(["CAT", "CATS", "RUN", "THE"]);
   });
 
   it("applies deny (with inflections), allow, and the offensive list", () => {

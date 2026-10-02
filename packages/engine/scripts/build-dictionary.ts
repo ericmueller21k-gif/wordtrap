@@ -16,11 +16,17 @@ const offensive = lines("sources/ldnoobw-en.txt").filter((l) => /^[a-z]+$/i.test
 
 const result = buildWordLists({
   realWords: lines("sources/enable1.txt"),
-  frequencyRanked: lines("sources/en_50k.txt").map((l) => l.split(" ")[0] ?? ""),
+  frequencyRanked: lines("sources/frequency-3to7.txt")
+    .filter((l) => l && !l.startsWith("#"))
+    .map((l) => {
+      const [word = "", count = "0"] = l.split(" ");
+      return [word, Number(count)] as const;
+    }),
   allow: lines("allow.txt"),
   deny: lines("deny.txt"),
   offensive,
   commonCutoff: DEFAULT_SETTINGS.dictionary.commonCutoff,
+  inflectionMinCount: DEFAULT_SETTINGS.dictionary.inflectionMinCount,
   minLength: DEFAULT_SETTINGS.minWordLength,
   maxLength: DEFAULT_SETTINGS.rackSize,
 });

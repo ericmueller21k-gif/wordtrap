@@ -2,12 +2,12 @@
 
 The built lists in `words/` are generated from the files below by
 `scripts/build-dictionary.ts` (`npm run build:dictionary`). Raw sources are
-committed unmodified so the build is reproducible offline.
+committed (unmodified, except the frequency list, which is trimmed as described) so the build is reproducible offline.
 
 | File | What it is | Used for | Source | Licence |
 | --- | --- | --- | --- | --- |
 | `sources/enable1.txt` | ENABLE2K word list (172,823 words), the list behind many word games. No proper nouns or abbreviations. | The real-word list (3-7 letter words) | https://raw.githubusercontent.com/dolph/dictionary/master/enable1.txt (mirror of the ENABLE project list) | Public domain (released into the public domain by its authors) |
-| `sources/en_50k.txt` | Top 50,000 English words by frequency in the OpenSubtitles 2018 corpus, from the FrequencyWords project | Ranking words for the common-word cutoff | https://github.com/hermitdave/FrequencyWords/blob/master/content/2018/en/en_50k.txt | Content: CC BY-SA 4.0 (code: MIT). Attribution: Hermit Dave, FrequencyWords; corpus: OpenSubtitles (opus.nlpl.eu) |
+| `sources/frequency-3to7.txt` | Word counts from the OpenSubtitles 2018 corpus (FrequencyWords `en_full.txt`), trimmed by `scripts/extract-frequency.ts` to the 40,228 words that are 3-7 letters and in ENABLE | Ranking words for the common-word cutoff, and checking that inflections are actually used | https://github.com/hermitdave/FrequencyWords/blob/master/content/2018/en/en_full.txt | Content: CC BY-SA 4.0 (code: MIT). Attribution: Hermit Dave, FrequencyWords; corpus: OpenSubtitles (opus.nlpl.eu) |
 | `sources/ldnoobw-en.txt` | List of Dirty, Naughty, Obscene, and Otherwise Bad Words (English) | Removing slurs and obscenities (and their plurals) from both lists | https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words | CC BY 4.0. Attribution: Shutterstock and contributors |
 | `allow.txt`, `deny.txt` | Hand-edited overrides | Settling playtest disputes | This repo | Same as this repo |
 
