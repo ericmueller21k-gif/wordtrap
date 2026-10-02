@@ -27,10 +27,11 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (request.method !== "GET" || url.origin !== location.origin || url.pathname.startsWith("/api/")) return;
 
-  // Every page (including /join/CODE invite links) is the single-page app.
+  // Every page (including /join/CODE invite links) is the single-page app. Fetch it fresh so an
+  // update shows up on the next open; fall back to the cached copy only when offline.
   if (request.mode === "navigate") {
     event.respondWith(
-      caches.match("/").then((cached) => cached || fetch(request)),
+      fetch(request).catch(() => caches.match("/").then((cached) => cached || Response.error())),
     );
     return;
   }

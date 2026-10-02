@@ -93,8 +93,8 @@ these were made without a review. Each one is easy to reverse. Most are a single
   drawn in `public/icons/icon.svg`; `scripts/make-icons.mjs` renders the PNGs). iPhone gets
   `apple-mobile-web-app-capable` and a translucent status bar. The layout already pads for the notch and home bar.
 - **Service worker** (generated at build time with every built file precached): the app opens instantly and works
-  offline for pass-the-phone games. The API is never cached. New versions take effect the next time the app is
-  opened, never mid-game.
+  offline for pass-the-phone games. The API is never cached. Pages are fetched fresh whenever online, so a deploy
+  shows up the next time the app is opened (cache only when offline). Changed Oct 2 after an update didn't appear.
 - **Add to Home Screen:** Android/Chrome gets a real **Install app** button (`beforeinstallprompt`). iPhone Safari has
   no install API, so it gets a short instruction card. Either card can be dismissed for good.
 - **iPhone storage:** the installed app doesn't share storage with Safari, so the iPhone card lists the rejoin codes
