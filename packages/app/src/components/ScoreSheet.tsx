@@ -58,7 +58,7 @@ export function ScoreSheet({ view, onClose }: ScoreSheetProps) {
         <p class="dialog-body small">
           <strong>Your word survives:</strong> you get its points plus a length bonus ({bonus}).
           <br />
-          <strong>You catch their word:</strong> you get half its points, rounded up, and they get nothing for it.
+          <strong>Your word gets caught:</strong> it scores nothing. Catching theirs stops them scoring.
         </p>
         <div class="dialog-actions">
           <button type="button" class="btn btn-primary" onClick={onClose}>

@@ -92,7 +92,9 @@ export function GuessScreen({ view, round, validate, onGuess, onDone, onHome }: 
             </div>
             <div class="reveal-points">
               {caught
-                ? `You earn ${catchReward(clue.tileScore)} points.`
+                ? catchReward(clue.tileScore) > 0
+                  ? `You earn ${catchReward(clue.tileScore)} points.`
+                  : `${opponent} scores nothing for it this round.`
                 : `${opponent} scores ${clue.tileScore + lengthBonus(clue.length)} for it.`}
             </div>
           </div>

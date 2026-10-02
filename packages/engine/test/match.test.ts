@@ -85,10 +85,10 @@ describe("match flow", () => {
     expect(stageFor(s, 0)).toEqual({ kind: "set", round: 1 });
     expect(stageFor(s, 1)).toEqual({ kind: "set", round: 1 });
 
-    // Round 1: Eric's THIS caught (Sam gets 8), Sam's QUITE survived (32 + 5 bonus).
-    expect(viewFor(s, 0).rounds[0]!.result).toEqual({ scores: [0, 45], caught: [true, false] });
-    expect(viewFor(s, 1).rounds[0]!.result).toEqual({ scores: [45, 0], caught: [false, true] });
-    expect(matchTotals(s)).toEqual([0, 45]);
+    // Round 1: Eric's THIS caught (scores nothing), Sam's QUITE survived (32 + 5 bonus).
+    expect(viewFor(s, 0).rounds[0]!.result).toEqual({ scores: [0, 37], caught: [true, false] });
+    expect(viewFor(s, 1).rounds[0]!.result).toEqual({ scores: [37, 0], caught: [false, true] });
+    expect(matchTotals(s)).toEqual([0, 37]);
   });
 
   it("with waitForRoundEnd off (the spec's flow), lets a player set their next word straight away", () => {
@@ -112,7 +112,7 @@ describe("match flow", () => {
     s = ok(submitGuess(s, 1, 0, "THUS", dict)).state;
     expect(isMatchFinished(s)).toBe(true);
     expect(stageFor(s, 0)).toEqual({ kind: "finished" });
-    expect(matchTotals(s)).toEqual([15 + 2 + 4, 0]);
+    expect(matchTotals(s)).toEqual([15 + 2, 0]);
   });
 
   it("tracks dismissed summaries per seat, only for complete rounds", () => {

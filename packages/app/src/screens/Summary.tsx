@@ -41,8 +41,8 @@ function WordBlock(props: {
       <div class="summary-points">
         {caught ? (
           <>
-            {word} was worth {tile}. {guesser} caught it on guess {caughtOn}, so <strong>{guesser} +{catchReward(tile)}</strong>{" "}
-            (half, rounded up) and {owner} +0.
+            {word} would have scored {tile}, but {guesser} caught it on guess {caughtOn}, so <strong>{owner} +0</strong>
+            {catchReward(tile) > 0 ? ` and ${guesser} +${catchReward(tile)} for the catch` : ""}.
           </>
         ) : (
           <>
