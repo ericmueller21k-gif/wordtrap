@@ -44,9 +44,10 @@ export class Dictionary {
     return this.real.size;
   }
 
-  /** Every common word that can be made from the rack, alphabetical. */
-  playableWords(rack: Rack): string[] {
+  /** Every common word that can be made from the rack (the reusable letter has no limit), alphabetical. */
+  playableWords(rack: Rack, reusable?: string | null): string[] {
     const available = countVector(rack.join(""));
+    if (reusable && rack.includes(reusable)) available[reusable.charCodeAt(0) - A] = 255;
     const out: string[] = [];
     outer: for (const { word, counts } of this.commonEntries) {
       if (word.length > rack.length) continue;

@@ -8,6 +8,8 @@ import {
   generateRack,
   letterCounts,
   mulberry32,
+  canMakeFromRack,
+  pickReusable,
   rackStats,
   type Settings,
 } from "../src/index.ts";
@@ -40,6 +42,54 @@ describe("drawRack", () => {
   });
 });
 
+describe("Q racks", () => {
+  it("always come with a U", () => {
+    const rng = mulberry32(11);
+    let qRacks = 0;
+    for (let i = 0; i < 20_000; i++) {
+      const rack = drawRack(rng);
+      if (rack.includes("Q")) {
+        qRacks++;
+        expect(rack).toContain("U");
+      }
+    }
+    expect(qRacks).toBeGreaterThan(500);
+  });
+});
+
+describe("reusable letter", () => {
+  it("is a rack letter, never an excluded one", () => {
+    const rng = mulberry32(5);
+    for (let i = 0; i < 2000; i++) {
+      const rack = drawRack(rng);
+      const r = pickReusable(rng, rack);
+      if (r === null) continue;
+      expect(rack).toContain(r);
+      expect(["J", "K", "Q", "V", "W", "X", "Y", "Z"]).not.toContain(r);
+    }
+  });
+
+  it("can be used any number of times", () => {
+    const rack = ["B", "A", "N", "E", "R", "T", "S"];
+    expect(canMakeFromRack("BANANA", rack, "A")).toBe(false); // only one N
+    expect(canMakeFromRack("BANANA", rack, "N")).toBe(false); // only one A
+    expect(canMakeFromRack("ASSESS", rack, "S")).toBe(true); // one A, one E, four S
+    expect(canMakeFromRack("TESTS", rack, "S")).toBe(false); // only one T
+    expect(canMakeFromRack("SEES", rack, "E")).toBe(false); // only one S
+    expect(canMakeFromRack("TREES", rack, "E")).toBe(true);
+    expect(canMakeFromRack("TREES", rack, null)).toBe(false);
+    expect(dict.playableWords(rack, "E")).toContain("TREES");
+    expect(dict.playableWords(rack)).not.toContain("TREES");
+  });
+
+  it("is dealt with every round", () => {
+    for (const round of generateMatchRounds(mulberry32(8), dict)) {
+      expect(round.reusable).toBeTruthy();
+      expect(round.rack).toContain(round.reusable);
+    }
+  });
+});
+
 describe("generateBoard", () => {
   it("keeps squares in range and on different slots, with each multiplier appearing", () => {
     const rng = mulberry32(7);
@@ -67,7 +117,8 @@ describe("generateRack", () => {
   it("only returns racks that pass the rack filter", () => {
     const rng = mulberry32(3);
     for (let i = 0; i < 50; i++) {
-      const stats = rackStats(generateRack(rng, dict), dict);
+      const { rack, reusable } = generateRack(rng, dict);
+      const stats = rackStats(rack, dict, undefined, reusable);
       expect(stats.commonWords).toBeGreaterThanOrEqual(25);
       expect(stats.longWords).toBeGreaterThanOrEqual(3);
     }

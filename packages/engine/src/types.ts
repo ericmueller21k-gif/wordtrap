@@ -15,6 +15,11 @@ export interface Board {
 export interface Round {
   rack: Rack;
   board: Board;
+  /**
+   * The round's reusable letter: one rack letter both players may use as many
+   * times as they like. Missing on rounds dealt before the rule existed.
+   */
+  reusable?: string | null;
 }
 
 /** What the opponent learns about a locked word. */

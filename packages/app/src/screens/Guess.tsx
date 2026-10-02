@@ -3,6 +3,7 @@ import { catchReward, lengthBonus, tileScore, type PlayerView, type RoundView } 
 import { BoardRow } from "../components/BoardRow.tsx";
 import { Header } from "../components/Header.tsx";
 import { RackView } from "../components/RackView.tsx";
+import { ReusableHint } from "../components/ReusableHint.tsx";
 import { useWordBuilder } from "../components/useWordBuilder.ts";
 import type { GuessResult } from "../game.ts";
 
@@ -18,7 +19,7 @@ interface GuessProps {
 
 export function GuessScreen({ view, round, validate, onGuess, onDone, onHome }: GuessProps) {
   const clue = round.clue!;
-  const b = useWordBuilder(round.rack, clue.length);
+  const b = useWordBuilder(round.rack, clue.length, round.reusable);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const opponent = view.opponentName ?? "Your friend";
@@ -144,6 +145,7 @@ export function GuessScreen({ view, round, validate, onGuess, onDone, onHome }: 
           </div>
         ) : (
           <>
+            <ReusableHint letter={round.reusable} />
             <RackView rack={round.rack} builder={b} disabled={busy} />
             <div class="actions">
               <button type="button" class="btn btn-secondary" onClick={() => (setMessage(null), b.shuffle())}>

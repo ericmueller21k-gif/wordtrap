@@ -65,7 +65,7 @@ export function GameFlow(props: GameFlowProps) {
         view={view}
         round={round}
         validate={(word) => {
-          const r = validateSetWord(word, round.rack, dictionary);
+          const r = validateSetWord(word, round.rack, dictionary, undefined, round.reusable);
           return r.ok ? null : r.message;
         }}
         onSubmit={(word) => props.setWord(stage.round, word)}
@@ -84,7 +84,12 @@ export function GameFlow(props: GameFlowProps) {
         validate={(guess) => {
           const r = validateGuess(
             guess,
-            { rack: round.rack, length: round.clue!.length, previousGuesses: round.myGuesses.map((g) => g.word) },
+            {
+              rack: round.rack,
+              reusable: round.reusable,
+              length: round.clue!.length,
+              previousGuesses: round.myGuesses.map((g) => g.word),
+            },
             dictionary,
           );
           return r.ok ? null : r.message;

@@ -44,10 +44,11 @@ function fail<P extends GuessProblem>(problem: P, settings: Settings): Validatio
 function checkTilesAndDictionary(
   word: string,
   rack: Rack,
+  reusable: string | null | undefined,
   dictionary: Dictionary,
   settings: Settings,
 ): ValidationResult<WordProblem> {
-  if (!canMakeFromRack(word, rack)) return fail("no_tiles", settings);
+  if (!canMakeFromRack(word, rack, reusable)) return fail("no_tiles", settings);
   if (dictionary.isCommon(word)) return { ok: true };
   return fail(dictionary.isReal(word) ? "uncommon" : "not_a_word", settings);
 }
@@ -58,11 +59,12 @@ export function validateSetWord(
   rack: Rack,
   dictionary: Dictionary,
   settings: Settings = DEFAULT_SETTINGS,
+  reusable?: string | null,
 ): ValidationResult<WordProblem> {
   if (!isAlphabetic(word)) return fail("not_letters", settings);
   if (word.length < settings.minWordLength) return fail("too_short", settings);
   if (word.length > settings.rackSize) return fail("too_long", settings);
-  return checkTilesAndDictionary(word, rack, dictionary, settings);
+  return checkTilesAndDictionary(word, rack, reusable, dictionary, settings);
 }
 
 export interface GuessContext {
@@ -70,6 +72,8 @@ export interface GuessContext {
   /** Length from the clue. */
   length: number;
   previousGuesses: readonly string[];
+  /** The round's reusable letter, if any. */
+  reusable?: string | null;
 }
 
 /**
@@ -85,5 +89,5 @@ export function validateGuess(
   if (!isAlphabetic(guess)) return fail("not_letters", settings);
   if (guess.length !== context.length) return fail("wrong_length", settings);
   if (context.previousGuesses.includes(guess)) return fail("repeated", settings);
-  return checkTilesAndDictionary(guess, context.rack, dictionary, settings);
+  return checkTilesAndDictionary(guess, context.rack, context.reusable, dictionary, settings);
 }

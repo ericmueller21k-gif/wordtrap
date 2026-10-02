@@ -143,7 +143,8 @@ export function setWord(
 ): { ok: true; state: MatchState } | MatchError {
   const stage = stageFor(state, seat);
   if (stage.kind !== "set" || stage.round !== round) return notYourTurn();
-  const check = validateSetWord(word, state.rounds[round]!.rack, dictionary, settings);
+  const { rack, reusable } = state.rounds[round]!;
+  const check = validateSetWord(word, rack, dictionary, settings, reusable);
   if (!check.ok) return check;
   return { ok: true, state: withSeatRound(state, round, seat, { ...state.progress[round]![seat], word }) };
 }
@@ -170,7 +171,12 @@ export function submitGuess(
   const secret = state.progress[round]![other(seat)].word!;
   const check = validateGuess(
     guess,
-    { rack: state.rounds[round]!.rack, length: secret.length, previousGuesses: me.guesses },
+    {
+      rack: state.rounds[round]!.rack,
+      reusable: state.rounds[round]!.reusable,
+      length: secret.length,
+      previousGuesses: me.guesses,
+    },
     dictionary,
     settings,
   );
@@ -205,6 +211,8 @@ export interface RoundView {
   index: number;
   rack: Rack;
   board: Board;
+  /** The letter both players may use any number of times this round. */
+  reusable: string | null;
   myWord: string | null;
   opponentSubmitted: boolean;
   /** Length and tile score of the other word, once both words are in. */
@@ -259,6 +267,7 @@ export function viewFor(state: MatchState, seat: Seat, settings: Settings = DEFA
       index: r,
       rack: state.rounds[r]!.rack,
       board: state.rounds[r]!.board,
+      reusable: state.rounds[r]!.reusable ?? null,
       myWord: me.word,
       opponentSubmitted: them.word !== null,
       clue: both ? clueFor(them.word!, state.rounds[r]!.board, settings) : null,

@@ -21,6 +21,7 @@ import {
   drawRack,
   generateBoard,
   generateRack,
+  pickReusable,
   isRackPlayable,
   lengthBonus,
   mulberry32,
@@ -71,13 +72,14 @@ interface WordRow {
 
 interface Deal {
   rack: Rack;
+  reusable: string | null;
   board: Board;
   words: WordRow[];
 }
 
-function analyseDeal(rack: Rack, board: Board): Deal {
+function analyseDeal(rack: Rack, reusable: string | null, board: Board): Deal {
   const playable = dict
-    .playableWords(rack)
+    .playableWords(rack, reusable)
     .filter((w) => w.length >= settings.minWordLength && w.length <= settings.rackSize);
   const groups = new Map<string, string[]>();
   const tiles = new Map<string, number>();
@@ -98,7 +100,7 @@ function analyseDeal(rack: Rack, board: Board): Deal {
       words.push({ word: w, length: w.length, tile: tiles.get(w)!, group: group.length, p });
     }
   }
-  return { rack, board, words };
+  return { rack, reusable, board, words };
 }
 
 // Payoffs for a word under a given rule variant.
@@ -143,13 +145,16 @@ const started = performance.now();
 const rng = mulberry32(SEED);
 const deals: Deal[] = [];
 for (let i = 0; i < DEALS; i++) {
-  const rack = generateRack(rng, dict, settings);
-  deals.push(analyseDeal(rack, generateBoard(rng, settings)));
+  const { rack, reusable } = generateRack(rng, dict, settings);
+  deals.push(analyseDeal(rack, reusable, generateBoard(rng, settings)));
 }
 const filterRng = mulberry32(SEED + 1);
 let passed = 0;
 const FILTER_SAMPLE = 5000;
-for (let i = 0; i < FILTER_SAMPLE; i++) if (isRackPlayable(drawRack(filterRng, settings), dict, settings)) passed++;
+for (let i = 0; i < FILTER_SAMPLE; i++) {
+  const rack = drawRack(filterRng, settings);
+  if (isRackPlayable(rack, dict, settings, pickReusable(filterRng, rack, settings))) passed++;
+}
 const seconds = ((performance.now() - started) / 1000).toFixed(1);
 
 // ---- Aggregate ----
@@ -280,7 +285,7 @@ out("## Example deals");
 out();
 for (const d of deals.slice(0, 3)) {
   const { letterSquare: ls, wordSquare: ws } = d.board;
-  out(`**Rack ${d.rack.join(" ")}**, ${ls.multiplier}L on slot ${ls.slot}, ${ws.multiplier}W on slot ${ws.slot}. ${d.words.length} playable words:`);
+  out(`**Rack ${d.rack.join(" ")}**${d.reusable ? ` (reusable ${d.reusable})` : ""}, ${ls.multiplier}L on slot ${ls.slot}, ${ws.multiplier}W on slot ${ws.slot}. ${d.words.length} playable words:`);
   out();
   const groups = new Map<string, WordRow[]>();
   for (const w of d.words) {

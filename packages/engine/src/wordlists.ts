@@ -55,6 +55,8 @@ export interface WordListSources {
    * added, because other inflections hit innocent words (BUTT -> BUTTER).
    */
   offensive: Iterable<string>;
+  /** Every real word is common (minus deny and offensive); the frequency rules are skipped. */
+  allRealWords?: boolean;
   /** Number of most frequent in-range real words taken before inflections. */
   commonCutoff: number;
   /**
@@ -110,6 +112,10 @@ export function buildWordLists(sources: WordListSources): WordLists {
     if (!real.has(w) || deny.has(w) || common.has(w)) continue;
     common.add(w);
     frequent.push(w);
+  }
+
+  if (sources.allRealWords) {
+    for (const w of real) if (!deny.has(w)) common.add(w);
   }
 
   let fromInflection = 0;
