@@ -48,14 +48,7 @@ export function SetWordScreen({ view, round, validate, onSubmit, onHome }: SetWo
 
   return (
     <div class="screen game-screen">
-      <Header
-        round={round.index}
-        roundsTotal={view.roundsTotal}
-        myName={view.myName}
-        opponentName={view.opponentName ?? "Friend"}
-        totals={view.totals}
-        onHome={onHome}
-      />
+      <Header round={round.index} view={view} onHome={onHome} />
       <main class="game-main">
         <div class="prompt">
           <div class="prompt-who">{view.myName}</div>

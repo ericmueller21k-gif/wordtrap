@@ -38,10 +38,22 @@ function WordBlock(props: {
           </div>
         ))}
       </div>
-      <div class="summary-points muted">
-        {caught
-          ? `${guesser} +${catchReward(tile)}, ${owner} +0`
-          : `${owner} +${tile + lengthBonus(word.length)}${lengthBonus(word.length) ? ` (incl. +${lengthBonus(word.length)} length bonus)` : ""}`}
+      <div class="summary-points">
+        {caught ? (
+          <>
+            {word} was worth {tile}. {guesser} caught it on guess {caughtOn}, so <strong>{guesser} +{catchReward(tile)}</strong>{" "}
+            (half, rounded up) and {owner} +0.
+          </>
+        ) : (
+          <>
+            {word} was worth {tile}
+            {lengthBonus(word.length) ? ` plus a ${lengthBonus(word.length)}-point length bonus` : ""}. It survived, so{" "}
+            <strong>
+              {owner} +{tile + lengthBonus(word.length)}
+            </strong>
+            .
+          </>
+        )}
       </div>
     </section>
   );

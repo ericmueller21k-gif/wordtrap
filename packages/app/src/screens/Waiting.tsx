@@ -24,14 +24,7 @@ export function WaitingScreen({ view, inviteUrl, joinCode, rejoinCode, onHome }:
 
   return (
     <div class="screen game-screen">
-      <Header
-        round={round}
-        roundsTotal={view.roundsTotal}
-        myName={view.myName}
-        opponentName={opponent ?? "Friend"}
-        totals={view.totals}
-        onHome={onHome}
-      />
+      <Header round={round} view={view} onHome={onHome} />
       <main class="game-main waiting">
         <div class="waiting-spinner" aria-hidden="true">
           <span />

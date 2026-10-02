@@ -65,6 +65,13 @@ test("a full pass-the-phone match", async ({ page }) => {
       );
       // Catch on even rounds (second guess), miss on odd rounds.
       const guess = me.guesses.length === 0 || round % 2 === 1 ? (others[0] ?? secret) : secret;
+      if (!shots.has("07-guess-empty")) {
+        // The score in the header opens the round-by-round scoreboard.
+        await page.getByRole("button", { name: /^Scores:/ }).click();
+        await expect(page.getByRole("dialog", { name: "Scores" })).toBeVisible();
+        await shot(page, "07b-score-sheet");
+        await page.getByRole("dialog", { name: "Scores" }).getByRole("button", { name: "Close" }).click();
+      }
       await once("07-guess-empty");
       await spell(page, guess);
       await once("08-guess-built");
