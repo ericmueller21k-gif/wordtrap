@@ -1,10 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { catchReward, clueFor, lengthBonus, scoreRound, scoreWord, tileScore, type Board } from "../src/index.ts";
+import {
+  catchReward,
+  clueFor,
+  DEFAULT_SETTINGS,
+  lengthBonus,
+  scoreRound,
+  scoreWord,
+  tileScore,
+  type Board,
+  type Settings,
+} from "../src/index.ts";
+
+// The spec's worked example uses its original length bonus; Eric changed the bonus on Oct 2 2026.
+const spec: Settings = { ...DEFAULT_SETTINGS, lengthBonus: { 5: 1, 6: 5, 7: 10 } };
 
 // spec.md worked example: rack Q U I T H E S, 3L on slot 2, 2W on slot 5.
 const board: Board = { letterSquare: { slot: 2, multiplier: 3 }, wordSquare: { slot: 5, multiplier: 2 } };
 
-describe("worked example from spec.md", () => {
+describe("worked example from spec.md (original length bonus)", () => {
   it.each([
     ["HIT", 8, 8, 4],
     ["THIS", 15, 15, 8],
@@ -14,8 +27,8 @@ describe("worked example from spec.md", () => {
   ])("%s: clue %i, survives %i, caught pays %i", (word, clue, survives, caught) => {
     expect(tileScore(word, board)).toBe(clue);
     expect(clueFor(word, board)).toEqual({ length: word.length, tileScore: clue });
-    expect(scoreWord(word, board, false)).toEqual({ owner: survives, guesser: 0 });
-    expect(scoreWord(word, board, true)).toEqual({ owner: 0, guesser: caught });
+    expect(scoreWord(word, board, false, spec)).toEqual({ owner: survives, guesser: 0 });
+    expect(scoreWord(word, board, true, spec)).toEqual({ owner: 0, guesser: caught });
   });
 });
 
@@ -34,8 +47,15 @@ describe("tileScore", () => {
 });
 
 describe("lengthBonus and catchReward", () => {
-  it("pays +1 / +5 / +10 for 5 / 6 / 7 letters and nothing shorter", () => {
-    expect([3, 4, 5, 6, 7].map((n) => lengthBonus(n))).toEqual([0, 0, 1, 5, 10]);
+  it("pays +2 / +5 / +10 / +20 for 4 / 5 / 6 / 7 letters and nothing for 3", () => {
+    expect([3, 4, 5, 6, 7].map((n) => lengthBonus(n))).toEqual([0, 2, 5, 10, 20]);
+  });
+
+  it("adds the current bonus to a surviving word", () => {
+    expect(scoreWord("HIT", board, false).owner).toBe(8);
+    expect(scoreWord("THIS", board, false).owner).toBe(17);
+    expect(scoreWord("QUITE", board, false).owner).toBe(37);
+    expect(scoreWord("QUIETS", board, false).owner).toBe(44);
   });
 
   it("rounds half the tile score up", () => {
@@ -51,10 +71,10 @@ describe("lengthBonus and catchReward", () => {
 
 describe("scoreRound", () => {
   it("adds a player's own word to what they earned by catching", () => {
-    // A's QUITE survives (33); B's THIS is caught by A (8).
-    expect(scoreRound(board, { word: "QUITE", caught: false }, { word: "THIS", caught: true })).toEqual([41, 0]);
+    // A's QUITE survives (37); B's THIS is caught by A (8).
+    expect(scoreRound(board, { word: "QUITE", caught: false }, { word: "THIS", caught: true })).toEqual([45, 0]);
     // Both survive.
-    expect(scoreRound(board, { word: "HIT", caught: false }, { word: "QUIETS", caught: false })).toEqual([8, 39]);
+    expect(scoreRound(board, { word: "HIT", caught: false }, { word: "QUIETS", caught: false })).toEqual([8, 44]);
     // Both caught.
     expect(scoreRound(board, { word: "HIT", caught: true }, { word: "QUIETS", caught: true })).toEqual([17, 4]);
   });

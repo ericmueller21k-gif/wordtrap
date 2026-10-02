@@ -14,9 +14,9 @@ describe("built word lists", () => {
     for (const w of real) expect(w, w).toMatch(/^[A-Z]{3,7}$/);
   });
 
-  it("are roughly the size the settings ask for", () => {
-    expect(common.length).toBeGreaterThan(10_000);
-    expect(common.length).toBeLessThan(25_000);
+  it("make every real word playable, minus the deny and offensive lists", () => {
+    expect(common.length).toBeGreaterThan(50_000);
+    expect(real.length - common.length).toBeLessThan(1_000);
   });
 
   it("include everyday words and regular inflections", () => {
@@ -25,9 +25,9 @@ describe("built word lists", () => {
     }
   });
 
-  it("know obscure words as real but not common", () => {
-    expect(dict.isReal("QAID")).toBe(true);
-    expect(dict.isCommon("QAID")).toBe(false);
+  it("accept less common real words", () => {
+    expect(dict.isCommon("DOLT")).toBe(true);
+    expect(dict.isCommon("QAID")).toBe(true);
   });
 
   it("drop denied names and offensive words", () => {

@@ -22,7 +22,24 @@ export function drawRack(rng: Rng, settings: Settings = DEFAULT_SETTINGS): Rack 
     bag[pick] = bag[bag.length - 1]!;
     bag.pop();
   }
+  // A Q with no U is nearly unplayable: swap one of the other tiles for a U from the bag.
+  if (settings.qNeedsU && rack.includes("Q") && !rack.includes("U") && bag.includes("U")) {
+    const others = rack.flatMap((l, i) => (l === "Q" ? [] : [i]));
+    rack[others[randomInt(rng, 0, others.length - 1)]!] = "U";
+  }
   return rack;
+}
+
+/** Picks the round's reusable letter from the rack, skipping excluded letters. Null if none qualifies. */
+export function pickReusable(rng: Rng, rack: Rack, settings: Settings = DEFAULT_SETTINGS): string | null {
+  if (!settings.reusableLetter.enabled) return null;
+  const eligible = [...new Set(rack)].filter((l) => !settings.reusableLetter.excluded.includes(l));
+  return eligible.length ? eligible[randomInt(rng, 0, eligible.length - 1)]! : null;
+}
+
+export interface DealtRack {
+  rack: Rack;
+  reusable: string | null;
 }
 
 export interface RackStats {
@@ -30,9 +47,14 @@ export interface RackStats {
   longWords: number;
 }
 
-export function rackStats(rack: Rack, dictionary: Dictionary, settings: Settings = DEFAULT_SETTINGS): RackStats {
+export function rackStats(
+  rack: Rack,
+  dictionary: Dictionary,
+  settings: Settings = DEFAULT_SETTINGS,
+  reusable?: string | null,
+): RackStats {
   const words = dictionary
-    .playableWords(rack)
+    .playableWords(rack, reusable)
     .filter((w) => w.length >= settings.minWordLength && w.length <= settings.rackSize);
   return {
     commonWords: words.length,
@@ -40,18 +62,25 @@ export function rackStats(rack: Rack, dictionary: Dictionary, settings: Settings
   };
 }
 
-export function isRackPlayable(rack: Rack, dictionary: Dictionary, settings: Settings = DEFAULT_SETTINGS): boolean {
-  const stats = rackStats(rack, dictionary, settings);
+export function isRackPlayable(
+  rack: Rack,
+  dictionary: Dictionary,
+  settings: Settings = DEFAULT_SETTINGS,
+  reusable?: string | null,
+): boolean {
+  const stats = rackStats(rack, dictionary, settings, reusable);
   return (
     stats.commonWords >= settings.rackFilter.minCommonWords && stats.longWords >= settings.rackFilter.minLongWords
   );
 }
 
-/** Draws racks until one passes the rack filter. */
-export function generateRack(rng: Rng, dictionary: Dictionary, settings: Settings = DEFAULT_SETTINGS): Rack {
+/** Draws racks (and their reusable letter) until one passes the rack filter. */
+export function generateRack(rng: Rng, dictionary: Dictionary, settings: Settings = DEFAULT_SETTINGS): DealtRack {
   for (let attempt = 0; attempt < settings.rackFilter.maxRedraws; attempt++) {
     const rack = drawRack(rng, settings);
-    if (isRackPlayable(rack, dictionary, settings)) return rack;
+    const reusable = pickReusable(rng, rack, settings);
+    if (settings.reusableLetter.enabled && reusable === null) continue;
+    if (isRackPlayable(rack, dictionary, settings, reusable)) return { rack, reusable };
   }
   throw new Error(`No playable rack after ${settings.rackFilter.maxRedraws} draws; check the rack filter settings`);
 }
@@ -73,7 +102,8 @@ export function generateBoard(rng: Rng, settings: Settings = DEFAULT_SETTINGS): 
 }
 
 export function generateRound(rng: Rng, dictionary: Dictionary, settings: Settings = DEFAULT_SETTINGS): Round {
-  return { rack: generateRack(rng, dictionary, settings), board: generateBoard(rng, settings) };
+  const { rack, reusable } = generateRack(rng, dictionary, settings);
+  return { rack, reusable, board: generateBoard(rng, settings) };
 }
 
 /** All rounds of a match, generated up front (on the server). */

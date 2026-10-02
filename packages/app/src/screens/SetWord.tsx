@@ -4,6 +4,7 @@ import { BoardRow } from "../components/BoardRow.tsx";
 import { ConfirmDialog } from "../components/ConfirmDialog.tsx";
 import { Header } from "../components/Header.tsx";
 import { RackView } from "../components/RackView.tsx";
+import { ReusableHint } from "../components/ReusableHint.tsx";
 import { useWordBuilder } from "../components/useWordBuilder.ts";
 import type { ActionResult } from "../game.ts";
 
@@ -17,7 +18,7 @@ interface SetWordProps {
 }
 
 export function SetWordScreen({ view, round, validate, onSubmit, onHome }: SetWordProps) {
-  const b = useWordBuilder(round.rack, DEFAULT_SETTINGS.rackSize);
+  const b = useWordBuilder(round.rack, DEFAULT_SETTINGS.rackSize, round.reusable);
   const [message, setMessage] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -87,6 +88,7 @@ export function SetWordScreen({ view, round, validate, onSubmit, onHome }: SetWo
         </div>
       </main>
       <footer class="game-footer">
+        <ReusableHint letter={round.reusable} />
         <RackView rack={round.rack} builder={b} disabled={busy} />
         <div class="actions">
           <button type="button" class="btn btn-secondary" onClick={edit(b.shuffle)}>

@@ -24,6 +24,13 @@ export interface Settings {
   catchRewardFraction: number;
   letterSquare: SquareSettings;
   wordSquare: SquareSettings;
+  /** If a rack has a Q and no U, one of its other tiles is swapped for a U. */
+  qNeedsU: boolean;
+  reusableLetter: {
+    enabled: boolean;
+    /** Rack letters never chosen as the reusable letter (rare or awkward ones). */
+    excluded: readonly string[];
+  };
   rackFilter: {
     minCommonWords: number;
     minLongWords: number;
@@ -33,7 +40,12 @@ export interface Settings {
     maxRedraws: number;
   };
   dictionary: {
-    /** How many of the most frequent 3-7 letter words form the common list. */
+    /**
+     * true: every real word is playable (minus deny.txt and the offensive list).
+     * false: only the most frequent words, per commonCutoff and inflectionMinCount.
+     */
+    allRealWords: boolean;
+    /** How many of the most frequent 3-7 letter words form the common list (when allRealWords is false). */
     commonCutoff: number;
     /**
      * A regular inflection of a common word is common only if it appears at
@@ -54,12 +66,16 @@ export const DEFAULT_SETTINGS: Settings = {
   // spec.md starts at 3; the balance report (reports/balance.md) showed 3 lets the
   // guesser catch ~94% of words, so v1 playtests with 2. See DECISIONS.md.
   guessesPerWord: 2,
-  lengthBonus: { 5: 1, 6: 5, 7: 10 },
+  // Eric, Oct 2 2026 (spec started at 5: +1, 6: +5, 7: +10).
+  lengthBonus: { 4: 2, 5: 5, 6: 10, 7: 20 },
   catchRewardFraction: 0.5,
   letterSquare: { multipliers: [2, 3], weights: [1, 1], minSlot: 1, maxSlot: 7 },
   wordSquare: { multipliers: [2, 3], weights: [1, 1], minSlot: 4, maxSlot: 7 },
+  qNeedsU: true,
+  reusableLetter: { enabled: true, excluded: ["J", "K", "Q", "V", "W", "X", "Y", "Z"] },
   rackFilter: { minCommonWords: 25, minLongWords: 3, longWordLength: 5, maxRedraws: 10_000 },
-  dictionary: { commonCutoff: 10_000, inflectionMinCount: 20 },
+  // Eric, Oct 2 2026: every real word is playable, minus offensive words and deny.txt.
+  dictionary: { allRealWords: true, commonCutoff: 10_000, inflectionMinCount: 20 },
   letterValues: {
     A: 1, E: 1, I: 1, L: 1, N: 1, O: 1, R: 1, S: 1, T: 1, U: 1,
     D: 2, G: 2,

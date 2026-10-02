@@ -102,3 +102,18 @@ these were made without a review. Each one is easy to reverse. Most are a single
 - **Not done (it needs Eric):** testing on a real iPhone and a real Android phone, using `TESTING.md`.
 - **Not done (optional):** iPhone launch splash images (iOS needs one per screen size). The app shows its own splash
   for the moment it takes to load.
+
+## Rule changes from Eric (Oct 2, 2026, after the first deploy)
+
+- **Every real word is playable** (`dictionary.allRealWords`). DOLT was rejected as "too uncommon", which wasn't what
+  Eric wanted. The deny list (names, a few slurs) and the LDNOOBW offensive list still apply. The frequency cutoff
+  is kept behind the setting in case it's wanted again.
+- **A reusable letter each round.** One rack letter, the same for both players, can be used any number of times.
+  It's picked at random from the rack, skipping J, K, Q, V, W, X, Y and Z (`reusableLetter.excluded`). Its tile shows
+  an ∞ badge and stays in the rack when placed. Rounds dealt before this change have no reusable letter.
+- **A rack with a Q always has a U** (`qNeedsU`): if a Q is drawn without a U, one of the other tiles becomes a U.
+- **Length bonus +2 / +5 / +10 / +20** for 4 / 5 / 6 / 7 letters (it was +1 / +5 / +10 for 5 / 6 / 7). The spec's
+  worked examples are still tested, using the spec's original bonus.
+- **Balance effect** (`reports/balance.md`): the catch rate drops from 71% to 67%, and the best word to set is now
+  usually 4 letters (52%), with 5 letters at 16% and 6 at 4%. Before, it was mostly 3 letters. Word choice is more
+  varied, so guesses stay at 2.

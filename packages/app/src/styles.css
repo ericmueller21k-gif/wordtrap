@@ -1205,3 +1205,39 @@ button.slot {
   gap: 4px;
   font-size: 14px;
 }
+
+/* ---- Reusable letter ---- */
+
+.rack-cell-reusable {
+  position: relative;
+}
+
+.reusable-badge,
+.reusable-badge-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.reusable-badge {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  z-index: 2;
+  box-shadow: 0 0 0 2px var(--surface-2);
+}
+
+.reusable-hint {
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+}

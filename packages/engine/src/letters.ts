@@ -15,10 +15,11 @@ export function letterCounts(letters: Iterable<string>): Map<string, number> {
   return counts;
 }
 
-/** True if `word` uses each rack tile at most once. */
-export function canMakeFromRack(word: string, rack: Rack): boolean {
+/** True if `word` uses each rack tile at most once, except the reusable letter, which has no limit. */
+export function canMakeFromRack(word: string, rack: Rack, reusable?: string | null): boolean {
   const available = letterCounts(rack);
   for (const ch of word) {
+    if (ch === reusable && available.has(ch)) continue;
     const left = available.get(ch) ?? 0;
     if (left === 0) return false;
     available.set(ch, left - 1);

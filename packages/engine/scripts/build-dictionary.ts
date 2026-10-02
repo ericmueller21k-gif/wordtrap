@@ -25,6 +25,7 @@ const result = buildWordLists({
   allow: lines("allow.txt"),
   deny: lines("deny.txt"),
   offensive,
+  allRealWords: DEFAULT_SETTINGS.dictionary.allRealWords,
   commonCutoff: DEFAULT_SETTINGS.dictionary.commonCutoff,
   inflectionMinCount: DEFAULT_SETTINGS.dictionary.inflectionMinCount,
   minLength: DEFAULT_SETTINGS.minWordLength,
