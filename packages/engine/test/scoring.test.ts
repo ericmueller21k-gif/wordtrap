@@ -12,7 +12,8 @@ import {
 } from "../src/index.ts";
 
 // The spec's worked example uses its original length bonus; Eric changed the bonus on Oct 2 2026.
-const spec: Settings = { ...DEFAULT_SETTINGS, lengthBonus: { 5: 1, 6: 5, 7: 10 } };
+// The spec's worked example uses its original length bonus and half-score catch reward; Eric changed both on Oct 2 2026.
+const spec: Settings = { ...DEFAULT_SETTINGS, lengthBonus: { 5: 1, 6: 5, 7: 10 }, catchRewardFraction: 0.5 };
 
 // spec.md worked example: rack Q U I T H E S, 3L on slot 2, 2W on slot 5.
 const board: Board = { letterSquare: { slot: 2, multiplier: 3 }, wordSquare: { slot: 5, multiplier: 2 } };
@@ -58,10 +59,12 @@ describe("lengthBonus and catchReward", () => {
     expect(scoreWord("QUIETS", board, false).owner).toBe(44);
   });
 
-  it("rounds half the tile score up", () => {
-    expect(catchReward(15)).toBe(8);
-    expect(catchReward(32)).toBe(16);
-    expect(catchReward(1)).toBe(1);
+  it("pays the catcher nothing now, and rounded-up half with the spec's setting", () => {
+    expect(catchReward(32)).toBe(0);
+    expect(scoreWord("QUITE", board, true)).toEqual({ owner: 0, guesser: 0 });
+    expect(catchReward(15, spec)).toBe(8);
+    expect(catchReward(32, spec)).toBe(16);
+    expect(catchReward(1, spec)).toBe(1);
   });
 
   it("never pays the length bonus on a caught word", () => {
@@ -71,11 +74,12 @@ describe("lengthBonus and catchReward", () => {
 
 describe("scoreRound", () => {
   it("adds a player's own word to what they earned by catching", () => {
-    // A's QUITE survives (37); B's THIS is caught by A (8).
-    expect(scoreRound(board, { word: "QUITE", caught: false }, { word: "THIS", caught: true })).toEqual([45, 0]);
+    // A's QUITE survives (37); B's THIS is caught by A (nothing for anyone).
+    expect(scoreRound(board, { word: "QUITE", caught: false }, { word: "THIS", caught: true })).toEqual([37, 0]);
     // Both survive.
     expect(scoreRound(board, { word: "HIT", caught: false }, { word: "QUIETS", caught: false })).toEqual([8, 44]);
-    // Both caught.
-    expect(scoreRound(board, { word: "HIT", caught: true }, { word: "QUIETS", caught: true })).toEqual([17, 4]);
+    // Both caught: nobody scores.
+    expect(scoreRound(board, { word: "HIT", caught: true }, { word: "QUIETS", caught: true })).toEqual([0, 0]);
+    expect(scoreRound(board, { word: "HIT", caught: true }, { word: "QUIETS", caught: true }, spec)).toEqual([17, 4]);
   });
 });

@@ -75,7 +75,9 @@ export const DEFAULT_SETTINGS: Settings = {
   waitForRoundEnd: true,
   // Eric, Oct 2 2026 (spec started at 5: +1, 6: +5, 7: +10).
   lengthBonus: { 4: 2, 5: 5, 6: 10, 7: 20 },
-  catchRewardFraction: 0.5,
+  // Eric, Oct 2 2026: you only score when your own word survives; catching earns nothing
+  // (spec.md paid the catcher half the tile score, which players found confusing).
+  catchRewardFraction: 0,
   letterSquare: { multipliers: [2, 3], weights: [1, 1], minSlot: 1, maxSlot: 7 },
   wordSquare: { multipliers: [2, 3], weights: [1, 1], minSlot: 4, maxSlot: 7 },
   qNeedsU: true,

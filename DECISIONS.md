@@ -130,3 +130,8 @@ these were made without a review. Each one is easy to reverse. Most are a single
 - **Results explain the points:** each word now reads like "WINED was worth 30. Choder caught it on guess 2, so
   Choder +15 (half, rounded up) and 67 +0." The first game showed the right totals, but it wasn't clear why a
   caught player's opponent scored.
+- **Catching scores nothing** (`catchRewardFraction: 0`, Eric's call). You only score when your own word survives;
+  catching the other word only stops them scoring. The spec paid the catcher half the tile score, which players
+  found confusing. Balance improved too: the best word to set is now 4 letters 51%, 5 letters 27%, 6 letters 9%
+  and 3 letters 13%, where before it was mostly 3-4 letters. The spec's worked examples are still tested with
+  the original settings.
