@@ -9,3 +9,4 @@ export * from "./validation.ts";
 export * from "./generation.ts";
 export * from "./wordlists.ts";
 export * from "./guesser.ts";
+export * from "./match.ts";

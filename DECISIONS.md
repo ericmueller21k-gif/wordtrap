@@ -39,3 +39,26 @@ these were made without a review. Each one is easy to reverse. Most are a single
 - **Caveat:** the simple guesser knows every playable word. People don't, so real catch rates will be lower than
   the report's, most of all for long words. If playtests show people rarely catch, go back to 3 guesses.
 - **AWOL added to `deny.txt`** (abbreviation).
+
+## Milestone 3: playable on one phone
+
+- **Stack: Vite + Preact + TypeScript.** Preact is a 4 KB React-compatible UI library. The whole app is about 15 KB
+  of gzipped JavaScript, which keeps taps and screen changes instant. There's no router, because screens are app
+  state with no page loads. The engine runs unchanged in the browser.
+- **Match flow lives in the engine** (`src/match.ts`) as a pure state machine with `viewFor(state, seat)`. That
+  function applies the spec's visibility table, so pass-the-phone play now and the server in milestone 4 share the
+  same rules and the same hiding.
+- **The creator can lock in a round 1 word before the friend joins.** The spec's Waiting screen ("Word locked in.
+  Waiting for Sam." with an invite link) implies this.
+- **Placing tiles:** tapping a rack tile fills the first open slot, and tapping a placed tile sends it back, which
+  can leave a gap. A word with a gap can't be locked in ("Close the gap..."). This follows the spec's "next open
+  slot" literally.
+- **The square label sits as a badge above a covering tile,** so 2L/3L/2W/3W stay readable.
+- **Pass-the-phone:** a "Pass the phone to Sam" screen goes between turns, so neither player sees the other's
+  word. Whoever holds the phone keeps it while they have something to do. Because the spec lets a player set their
+  next word without waiting, one player sometimes plays two steps in a row.
+- **Smallest supported width is 375 px** (iPhone SE 2nd/3rd gen and every current iPhone). Seven 44 px tiles don't
+  fit on the old 320 px phones, which iOS 18 no longer supports.
+- **Tests:** Playwright plays a full match on emulated iPhone 13, iPhone SE (3rd gen) and Pixel 7, and checks that
+  game screens don't scroll and that every button is at least 44 px. Chromium stands in for Safari here, so the
+  real-iPhone check in milestone 5 still matters.

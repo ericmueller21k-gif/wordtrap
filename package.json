@@ -7,11 +7,15 @@
   ],
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc -p packages/engine --noEmit",
+    "typecheck": "tsc -p packages/engine --noEmit && tsc -p packages/app --noEmit",
     "build:dictionary": "tsx packages/engine/scripts/build-dictionary.ts",
-    "balance": "tsx packages/engine/scripts/balance-report.ts"
+    "balance": "tsx packages/engine/scripts/balance-report.ts",
+    "dev": "npm run dev -w @wordtrap/app",
+    "build": "npm run build -w @wordtrap/app",
+    "e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0",
